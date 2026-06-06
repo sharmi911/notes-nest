@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Notes Nest</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body data-theme="default">
+
+<!-- ======= LOGIN PAGE ======= -->
+<div id="loginPage" class="page active">
+  <div class="login-blobs">
+    <div class="blob b1"></div><div class="blob b2"></div>
+    <div class="blob b3"></div><div class="blob b4"></div>
+  </div>
+  <div class="login-wrap">
+    <div class="login-brand">
+      <span class="brand-icon-big">🪺</span>
+      <h1 class="brand-title">Notes Nest</h1>
+      <p class="brand-sub">Your colorful corner for ideas</p>
+    </div>
+
+    <!-- STEP 1: Identifier -->
+    <div id="stepId" class="login-card">
+      <h2>Welcome! 👋</h2>
+      <p class="step-hint">Enter your username or email to continue</p>
+      <div class="field-wrap">
+        <i class="fa fa-user"></i>
+        <input type="text" id="userIdentifier" placeholder="Username or Email" autocomplete="off"/>
+      </div>
+      <div id="idError" class="err-msg"></div>
+      <button class="btn-pill btn-main" onclick="checkIdentifier()">Continue <i class="fa fa-arrow-right"></i></button>
+      <div class="divider"><span>or</span></div>
+      <button class="btn-pill btn-email" onclick="showRegister()"><i class="fa fa-user-plus"></i> Create new account</button>
+    </div>
+
+    <!-- STEP 2: Password -->
+    <div id="stepPassword" class="login-card hidden">
+      <button class="back-btn" onclick="goBackToId()"><i class="fa fa-arrow-left"></i> Back</button>
+      <div class="greeting-user">
+        <div class="user-avatar-big" id="greetAvatar"></div>
+        <h2 id="greetName">Hey!</h2>
+        <p class="step-hint">Enter your password to continue</p>
+      </div>
+      <div class="field-wrap">
+        <i class="fa fa-lock"></i>
+        <input type="password" id="loginPassword" placeholder="Password"/>
+        <span class="eye-btn" onclick="toggleEye('loginPassword',this)"><i class="fa fa-eye"></i></span>
+      </div>
+      <div id="pwError" class="err-msg"></div>
+      <button class="btn-pill btn-main" onclick="doLogin()"><i class="fa fa-sign-in-alt"></i> Sign In</button>
+      <a class="forgot-link" onclick="showForgot()">Forgot password?</a>
+    </div>
+
+    <!-- REGISTER -->
+    <div id="stepRegister" class="login-card hidden">
+      <button class="back-btn" onclick="goBackToId()"><i class="fa fa-arrow-left"></i> Back</button>
+      <h2>Create Account 🎉</h2>
+      <p class="step-hint">Fill in your details to get started</p>
+      <div class="field-wrap">
+        <i class="fa fa-user"></i>
+        <input type="text" id="regUsername" placeholder="Choose a username" autocomplete="off"/>
+      </div>
+      <div class="field-wrap">
+        <i class="fa fa-envelope"></i>
+        <input type="email" id="regEmail" placeholder="Email address"/>
+      </div>
+      <div class="field-wrap">
+        <i class="fa fa-lock"></i>
+        <input type="password" id="regPassword" placeholder="Create a password"/>
+        <span class="eye-btn" onclick="toggleEye('regPassword',this)"><i class="fa fa-eye"></i></span>
+      </div>
+      <div class="field-wrap">
+        <i class="fa fa-lock"></i>
+        <input type="password" id="regConfirm" placeholder="Confirm password"/>
+      </div>
+      <div id="regError" class="err-msg"></div>
+      <button class="btn-pill btn-main" onclick="doRegister()">Create Account 🚀</button>
+    </div>
+
+    <!-- FORGOT PASSWORD -->
+    <div id="stepForgot" class="login-card hidden">
+      <button class="back-btn" onclick="showStepPassword()"><i class="fa fa-arrow-left"></i> Back</button>
+      <h2>Reset Password 🔑</h2>
+      <p class="step-hint">Enter the email linked to your account</p>
+      <div class="field-wrap">
+        <i class="fa fa-envelope"></i>
+        <input type="email" id="forgotEmail" placeholder="Your email address"/>
+      </div>
+      <div id="forgotError" class="err-msg"></div>
+      <div id="forgotSuccess" class="success-msg"></div>
+      <button id="forgotSubmitBtn" class="btn-pill btn-main" onclick="checkForgotEmail()">Find My Account</button>
+      <div id="newPasswordSection" class="hidden">
+        <div class="field-wrap">
+          <i class="fa fa-lock"></i>
+          <input type="password" id="newPassword" placeholder="New password"/>
+        </div>
+        <div class="field-wrap">
+          <i class="fa fa-lock"></i>
+          <input type="password" id="newConfirm" placeholder="Confirm new password"/>
+        </div>
+        <div id="resetError" class="err-msg"></div>
+        <button class="btn-pill btn-main" onclick="doResetPassword()">Set New Password ✅</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======= MAIN APP ======= -->
+<div id="appPage" class="page">
+
+  <div id="sidebarOverlay" class="sidebar-overlay" onclick="closeSidebar()"></div>
+
+  <!-- Sidebar -->
+  <aside id="sidebar">
+    <div class="sb-top">
+      <div class="sb-brand">🪺 <span>Notes Nest</span></div>
+      <button class="sb-close" onclick="closeSidebar()"><i class="fa fa-times"></i></button>
+    </div>
+    <div class="sb-user">
+      <div class="sb-avatar" id="sbAvatar"></div>
+      <div style="min-width:0">
+        <div class="sb-uname" id="sbUname"></div>
+        <div class="sb-uemail" id="sbEmail"></div>
+      </div>
+    </div>
+    <nav class="sb-nav">
+      <button class="sb-btn active" data-filter="all" onclick="filterNotes('all',this)">
+        <i class="fa fa-th-large"></i> All Notes
+      </button>
+      <button class="sb-btn" data-filter="pinned" onclick="filterNotes('pinned',this)">
+        <i class="fa fa-thumbtack"></i> Pinned
+      </button>
+      <hr class="sb-divider"/>
+      <div class="sb-label">Categories</div>
+      <button class="sb-btn" data-filter="work" onclick="filterNotes('work',this)">
+        <i class="fa fa-briefcase"></i> Work
+      </button>
+      <button class="sb-btn" data-filter="personal" onclick="filterNotes('personal',this)">
+        <i class="fa fa-heart"></i> Personal
+      </button>
+      <button class="sb-btn" data-filter="ideas" onclick="filterNotes('ideas',this)">
+        <i class="fa fa-lightbulb"></i> Ideas
+      </button>
+      <button class="sb-btn" data-filter="todo" onclick="filterNotes('todo',this)">
+        <i class="fa fa-check-square"></i> To-Do
+      </button>
+    </nav>
+    <div class="sb-footer">
+      <button class="sb-btn sb-settings-btn" onclick="openSettings()">
+        <i class="fa fa-cog"></i> Settings
+      </button>
+      <button class="sb-btn sb-logout-btn" onclick="doLogout()">
+        <i class="fa fa-sign-out-alt"></i> Logout
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main id="mainArea">
+    <header class="app-header">
+      <button class="ham-btn" onclick="openSidebar()"><i class="fa fa-bars"></i></button>
+      <div class="search-box">
+        <i class="fa fa-search"></i>
+        <input type="text" id="searchInput" placeholder="Search notes…" oninput="searchNotes()"/>
+      </div>
+      <button class="add-btn" onclick="openNoteModal()">
+        <i class="fa fa-plus"></i> <span>New Note</span>
+      </button>
+    </header>
+
+    <div class="notes-topbar">
+      <h2 id="notesHeading">All Notes</h2>
+      <div class="view-btns">
+        <button id="gridViewBtn" class="view-btn active" onclick="setView('grid')" title="Grid view"><i class="fa fa-th"></i></button>
+        <button id="listViewBtn" class="view-btn" onclick="setView('list')" title="List view"><i class="fa fa-list"></i></button>
+      </div>
+    </div>
+
+    <div id="notesGrid" class="notes-grid"></div>
+    <div id="emptyState" class="empty-state hidden">
+      <div class="empty-emoji">🪺</div>
+      <h3>No notes here yet!</h3>
+      <p>Tap <b>+ New Note</b> to start nesting your ideas</p>
+    </div>
+  </main>
+</div>
+
+<!-- ======= NOTE MODAL ======= -->
+<div id="noteModal" class="modal-bg hidden" onclick="modalBgClick(event,'noteModal')">
+  <div class="modal-box note-modal-box">
+    <div class="modal-head">
+      <input id="noteTitle" class="note-title-input" placeholder="Note title…" type="text"/>
+      <button class="modal-x" onclick="closeNoteModal()"><i class="fa fa-times"></i></button>
+    </div>
+    <div class="note-meta-bar">
+      <select id="noteCategory">
+        <option value="general">📝 General</option>
+        <option value="work">💼 Work</option>
+        <option value="personal">❤️ Personal</option>
+        <option value="ideas">💡 Ideas</option>
+        <option value="todo">✅ To-Do</option>
+      </select>
+      <div class="color-row">
+        <span>Color:</span>
+        <button class="cdot selected" style="background:#FFE066" data-c="#FFE066" onclick="pickColor(this)"></button>
+        <button class="cdot" style="background:#FF8FAB" data-c="#FF8FAB" onclick="pickColor(this)"></button>
+        <button class="cdot" style="background:#A8E6CF" data-c="#A8E6CF" onclick="pickColor(this)"></button>
+        <button class="cdot" style="background:#A0C4FF" data-c="#A0C4FF" onclick="pickColor(this)"></button>
+        <button class="cdot" style="background:#D4A5F5" data-c="#D4A5F5" onclick="pickColor(this)"></button>
+        <button class="cdot" style="background:#FFD6A5" data-c="#FFD6A5" onclick="pickColor(this)"></button>
+        <button class="cdot" style="background:#CAFFBF" data-c="#CAFFBF" onclick="pickColor(this)"></button>
+        <button class="cdot" style="background:#FDFFB6" data-c="#FDFFB6" onclick="pickColor(this)"></button>
+      </div>
+    </div>
+    <!-- TO-DO checklist -->
+    <div id="todoArea" class="todo-area hidden">
+      <div id="todoList" class="todo-list"></div>
+      <div class="todo-add-row">
+        <input id="todoInput" type="text" placeholder="Add checklist item…" onkeydown="todoKeydown(event)"/>
+        <button onclick="addTodoItem()"><i class="fa fa-plus"></i></button>
+      </div>
+    </div>
+    <textarea id="noteContent" placeholder="Write your note here…"></textarea>
+    <div class="modal-foot">
+      <input type="hidden" id="editingId"/>
+      <button class="btn-pill btn-cancel" onclick="closeNoteModal()">Cancel</button>
+      <button class="btn-pill btn-save" onclick="saveNote()"><i class="fa fa-save"></i> Save Note</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======= DELETE MODAL ======= -->
+<div id="deleteModal" class="modal-bg hidden" onclick="modalBgClick(event,'deleteModal')">
+  <div class="modal-box delete-box">
+    <div class="del-icon">🗑️</div>
+    <h3>Delete this note?</h3>
+    <p>This action cannot be undone.</p>
+    <div class="del-btns">
+      <button class="btn-pill btn-cancel" onclick="closeModal('deleteModal')">Cancel</button>
+      <button class="btn-pill btn-delete" onclick="confirmDelete()">Yes, Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======= SETTINGS MODAL ======= -->
+<div id="settingsModal" class="modal-bg hidden" onclick="modalBgClick(event,'settingsModal')">
+  <div class="modal-box settings-box">
+
+    <div class="modal-head" style="padding:20px 20px 16px; border-bottom:2px solid var(--border);">
+      <h2 style="flex:1; font-family:var(--font-head); font-size:22px; color:var(--text);">⚙️ Settings</h2>
+      <button class="modal-x" onclick="closeModal('settingsModal')"><i class="fa fa-times"></i></button>
+    </div>
+
+    <div class="settings-body">
+
+      <!-- Account Info -->
+      <div class="settings-section">
+        <div class="settings-label">👤 Account Info</div>
+        <div class="account-info">
+          <div class="ai-row"><span>Username</span><b id="settingsUsername"></b></div>
+          <div class="ai-row"><span>Email</span><b id="settingsEmail"></b></div>
+          <div class="ai-row"><span>Total Notes</span><b id="settingsNoteCount"></b></div>
+          <div class="ai-row"><span>Member Since</span><b id="settingsJoined"></b></div>
+        </div>
+      </div>
+
+      <!-- Theme -->
+      <div class="settings-section">
+        <div class="settings-label">🎨 App Theme</div>
+        <p class="settings-hint">Choose a color theme for your Notes Nest</p>
+        <div class="theme-grid">
+          <button class="theme-chip active" data-theme="default" onclick="setTheme('default',this)">🌈 Playful</button>
+          <button class="theme-chip" data-theme="ocean"   onclick="setTheme('ocean',this)">🌊 Ocean</button>
+          <button class="theme-chip" data-theme="candy"   onclick="setTheme('candy',this)">🍬 Candy</button>
+          <button class="theme-chip" data-theme="forest"  onclick="setTheme('forest',this)">🌿 Forest</button>
+          <button class="theme-chip" data-theme="sunset"  onclick="setTheme('sunset',this)">🌅 Sunset</button>
+          <button class="theme-chip" data-theme="midnight" onclick="setTheme('midnight',this)">🌙 Midnight</button>
+        </div>
+      </div>
+
+      <!-- Change Password -->
+      <div class="settings-section pw-section">
+        <div class="settings-label">🔐 Change Password</div>
+        <div class="field-wrap">
+          <i class="fa fa-lock"></i>
+          <input type="password" id="oldPassword" placeholder="Current password"/>
+        </div>
+        <div class="field-wrap">
+          <i class="fa fa-lock"></i>
+          <input type="password" id="newPasswordSetting" placeholder="New password"/>
+        </div>
+        <div class="field-wrap">
+          <i class="fa fa-lock"></i>
+          <input type="password" id="confirmNewPassword" placeholder="Confirm new password"/>
+        </div>
+        <div id="pwChangeMsg"></div>
+        <button class="btn-save-sm" onclick="changePassword()">Update Password</button>
+      </div>
+
+      <!-- Admin Notifications -->
+      <div class="settings-section">
+        <div class="settings-label">🔔 Admin Notifications</div>
+        <p class="settings-hint">
+          When a user signs up or logs in, your mail app will open with a pre-filled email to this address.
+        </p>
+        <div class="field-wrap">
+          <i class="fa fa-envelope"></i>
+          <input type="email" id="adminEmailInput" placeholder="admin@youremail.com"/>
+        </div>
+        <button class="btn-save-sm" onclick="saveAdminEmail()">Save Email</button>
+      </div>
+
+      <!-- Danger Zone -->
+      <div class="settings-section">
+        <div class="settings-label" style="color:#ff4f7b;">⚠️ Account Actions</div>
+        <button class="btn-pill btn-delete" style="width:auto; padding:10px 22px;" onclick="confirmLogoutAll()">
+          <i class="fa fa-sign-out-alt"></i> Logout &amp; Clear Session
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ======= TOAST ======= -->
+<div id="toast" class="toast"></div>
+
+<!-- ======= NOTIFICATION BELL ======= -->
+<div id="notifBell" class="notif-bell hidden" onclick="openNotifPanel()">
+  <i class="fa fa-bell"></i>
+  <span id="notifCount" class="notif-count">0</span>
+</div>
+
+<!-- ======= NOTIFICATION PANEL ======= -->
+<div id="notifPanel" class="notif-panel hidden">
+  <div class="notif-head">
+    <span>🔔 Activity</span>
+    <div class="notif-head-actions">
+      <button class="clear-btn" onclick="clearNotifs()">Clear all</button>
+      <button onclick="closeNotifPanel()"><i class="fa fa-times"></i></button>
+    </div>
+  </div>
+  <div id="notifList" class="notif-list"></div>
+</div>
+
+<script>
+  // tiny inline helper so toggleEye works before app.js loads
+  function toggleEye(inputId, btn) {
+    const el = document.getElementById(inputId);
+    const isHidden = el.type === 'password';
+    el.type = isHidden ? 'text' : 'password';
+    btn.innerHTML = isHidden ? '<i class="fa fa-eye-slash"></i>' : '<i class="fa fa-eye"></i>';
+  }
+</script>
+<script src="js/app.js"></script>
+</body>
+</html>
